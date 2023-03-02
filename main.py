@@ -14,12 +14,13 @@ from selenium import webdriver, __version__ as seleniumVersion
 from pyproc import Lpse, __version__ as pyprocVersion
 from datetime import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
+import sys
 
 Author = "Crafted by Mhd Afizha Aw"
 Logo = 'log.opng'
 Version = '0.1.3'
 
-
+# LAYOUT
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         # Layout
@@ -163,6 +164,7 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         self.btn_Batch.setFont(font)
         self.btn_Batch.setObjectName("btn_Batch")
+        self.btn_Batch.setStyleSheet(btnCSS)
         self.gridLayout.addWidget(self.btn_Batch, 5, 0, 1, 1)
 
         # Engine 1
@@ -214,8 +216,8 @@ class Ui_MainWindow(object):
         self.text_Log.setObjectName("text_Log")
         self.text_Log.setStyleSheet(LogCSS)
 
+        # END
         self.gridLayout.addWidget(self.text_Log, 4, 0, 1, 4)
-
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -223,7 +225,7 @@ class Ui_MainWindow(object):
 
     # Controller -----------------------------------------------------------------------------------------------------------
         # test selenium
-        #browser = self.seleniumConfig()
+        # browser = self.seleniumConfig()
 
         # browser.get('https://github.com/seimpairiyun')
         # browser.capabilities['browserVersion']
@@ -233,9 +235,9 @@ class Ui_MainWindow(object):
 
         # self.engine_PyProc.stateChanged.connect(lambda:self.engineSetup(self.engine_PyProc))
         # self.engine_Selenium.toggled.connect(lambda:self.engineSetup(self.engine_Selenium))
+
         self.engine_PyProc.stateChanged.connect(self.engineSetup)
         self.engine_Selenium.toggled.connect(self.engineSetup)
-
         self.btn_Download.clicked.connect(self.btnDownload)
 
     def retranslateUi(self, MainWindow):
@@ -268,9 +270,8 @@ class Ui_MainWindow(object):
             '- Lapor bug atau bantu ngembangin aplikasi https://github.com/seimpairiyun/LPSE-2E')
 
     # UTILITY
-
-    def getTime(self):
-        return datetime.now()
+    # def getTime(self):
+    #     return datetime.now()
 
     def btnDownload(self):
         self.text_Log.setText(str(self.Tahun.currentText()))
@@ -299,7 +300,7 @@ class Ui_MainWindow(object):
             engine = ''
 
         return engine
-        #print(f'{i.text()}: {i.isChecked()}')
+        # print(f'{i.text()}: {i.isChecked()}')
 
     def seleniumConfig(self):
         options = Options()
@@ -320,12 +321,34 @@ class Ui_MainWindow(object):
 
         return driver
 
+# MAIN
+
+
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    def __init__(self, *args, obj=None, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+
+    def getTime(self):
+         return datetime.now()
+
+    def closeEvent(self, event):
+        # close = QtWidgets.QMessageBox()
+        # close.setText("You sure?")
+        # close.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel)
+        # close = close.exec()
+
+        # if close == QtWidgets.QMessageBox.Yes:
+        #     event.accept()
+        #     print(1)
+        # else:
+        #     event.ignore()
+        event.accept()
+        print('Close')
+
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    main = MainWindow()
+    main.show()
     sys.exit(app.exec_())
