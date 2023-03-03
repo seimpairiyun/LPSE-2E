@@ -1,7 +1,11 @@
 # 12 Februari 2023 by Mhd Afizha Aw
 # Created by: PyQt5 UI code generator 5.15.1
 from socket import timeout as TIMEOUT_1, gaierror as TIMEOUT_5
-from urllib3.exceptions import ReadTimeoutError as TIMEOUT_2, NewConnectionError as TIMEOUT_6, MaxRetryError as TIMEOUT_7
+from urllib3.exceptions import (
+    ReadTimeoutError as TIMEOUT_2,
+    NewConnectionError as TIMEOUT_6,
+    MaxRetryError as TIMEOUT_7,
+)
 from requests.exceptions import ReadTimeout as TIMEOUT_3, ConnectionError as TIMEOUT_4
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.webdriver.support import expected_conditions
@@ -12,38 +16,54 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver, __version__ as seleniumVersion
 from pyproc import Lpse, __version__ as pyprocVersion
+from pyproc.utils import re
 from datetime import datetime
+from PyQt5.QtCore import Qt, QMetaObject, QCoreApplication, QSize, QEventLoop, QTimer
+from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtWidgets import (
+    QWidget,
+    QMainWindow,
+    QApplication,
+    QGridLayout,
+    QSizePolicy,
+    QLabel,
+    QLineEdit,
+    QComboBox,
+    QPushButton,
+    QTextBrowser,
+    QCheckBox,
+    QProgressDialog,
+)
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 
+# ABOUT
 Author = "Crafted by Mhd Afizha Aw"
-Logo = 'log.opng'
-Version = '0.1.3'
+Logo = "log.opng"
+Version = "0.1.3"
 
 # LAYOUT
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        # Layout
+        # UI
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(650, 600)
         MainWindow
 
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
 
-        # Label --------------------------------------------------------------------------------------------
+        # LABEL -------------------------------------------------------------------------------------------->
         # Tahun
-        self.label_Tahun = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
+        self.label_Tahun = QLabel(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.label_Tahun.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.label_Tahun.sizePolicy().hasHeightForWidth())
         self.label_Tahun.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
+        font = QFont()
         font.setBold(True)
         font.setWeight(75)
         self.label_Tahun.setFont(font)
@@ -51,52 +71,47 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.label_Tahun, 0, 0, 1, 1)
 
         # URL
-        self.label_URL = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
+        self.label_URL = QLabel(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.label_URL.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.label_URL.sizePolicy().hasHeightForWidth())
         self.label_URL.setSizePolicy(sizePolicy)
         self.label_URL.setFont(font)
         self.label_URL.setStyleSheet("")
         self.label_URL.setObjectName("label_URL")
         self.gridLayout.addWidget(self.label_URL, 1, 0, 1, 1)
 
-        # Label Engine
-        self.label_Engine = QtWidgets.QLabel(self.centralwidget)
+        # Engine
+        self.label_Engine = QLabel(self.centralwidget)
         self.label_Engine.setFont(font)
         self.label_Engine.setObjectName("label_Engine")
         self.gridLayout.addWidget(self.label_Engine, 3, 0, 1, 1)
 
         # Programmer
-        self.label_Author = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Ignored)
+        self.label_Author = QLabel(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.label_Author.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.label_Author.sizePolicy().hasHeightForWidth())
         self.label_Author.setSizePolicy(sizePolicy)
         self.label_Author.setAlignment(
-            QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
+            Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter
+        )
         self.label_Author.setObjectName("label_Author")
         # self.label_Author.setToolTip("https://github.com/seimpairiyun")
         self.gridLayout.addWidget(self.label_Author, 5, 3, 1, 1)
 
-        # -------------------------------------------------------------------------------------------- Label
+        # -------------------------------------------------------------------------------------------- LABEL
 
         # Input Tahun
-        self.Tahun = QtWidgets.QComboBox(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.Tahun = QComboBox(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.Tahun.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.Tahun.sizePolicy().hasHeightForWidth())
         self.Tahun.setSizePolicy(sizePolicy)
-        self.Tahun.setMinimumSize(QtCore.QSize(0, 0))
+        self.Tahun.setMinimumSize(QSize(0, 0))
         self.Tahun.setObjectName("Tahun")
         self.Tahun.setFocus()
         self.gridLayout.addWidget(self.Tahun, 0, 1, 1, 2)
@@ -108,9 +123,8 @@ class Ui_MainWindow(object):
                 self.Tahun.addItem(str(th))
 
         # Input URL
-        self.URL = QtWidgets.QLineEdit(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.URL = QLineEdit(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.URL.sizePolicy().hasHeightForWidth())
@@ -137,29 +151,25 @@ class Ui_MainWindow(object):
         """
 
         # Button Download
-        self.btn_Download = QtWidgets.QPushButton(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding)
+        self.btn_Download = QPushButton(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHeightForWidth(
-            self.btn_Download.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.btn_Download.sizePolicy().hasHeightForWidth())
         self.btn_Download.setSizePolicy(sizePolicy)
-        self.btn_Download.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.btn_Download.setLayoutDirection(Qt.RightToLeft)
         self.btn_Download.setObjectName("btn_Download")
         self.btn_Download.setStyleSheet(btnCSS)
         self.gridLayout.addWidget(self.btn_Download, 0, 3, 2, 1)
 
         # Button Batch Download
-        self.btn_Batch = QtWidgets.QPushButton(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
+        self.btn_Batch = QPushButton(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.btn_Batch.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.btn_Batch.sizePolicy().hasHeightForWidth())
         self.btn_Batch.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
+        font = QFont()
         font.setBold(False)
         font.setWeight(50)
         self.btn_Batch.setFont(font)
@@ -168,50 +178,53 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.btn_Batch, 5, 0, 1, 1)
 
         # Engine 1
-        self.engine_PyProc = QtWidgets.QCheckBox(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.engine_PyProc = QCheckBox(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.engine_PyProc.sizePolicy().hasHeightForWidth())
+            self.engine_PyProc.sizePolicy().hasHeightForWidth()
+        )
         self.engine_PyProc.setSizePolicy(sizePolicy)
         self.engine_PyProc.setObjectName("engine_PyProc")
-        self.engine_PyProc.setToolTip('https://github.com/wakataw/pyproc')
+        self.engine_PyProc.setToolTip("https://github.com/wakataw/pyproc")
         self.gridLayout.addWidget(self.engine_PyProc, 3, 1, 1, 1)
 
         # Engine 2
-        self.engine_Selenium = QtWidgets.QCheckBox(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        self.engine_Selenium = QCheckBox(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.engine_Selenium.sizePolicy().hasHeightForWidth())
+            self.engine_Selenium.sizePolicy().hasHeightForWidth()
+        )
         self.engine_Selenium.setSizePolicy(sizePolicy)
         self.engine_Selenium.setObjectName("engine_Selenium")
         self.engine_Selenium.setToolTip(
-            'Lambat tapi pasti, namun tidak ada yg pasti di dunia ini')
+            "Lambat tapi pasti, namun tidak ada yg pasti di dunia ini"
+        )
         self.gridLayout.addWidget(self.engine_Selenium, 3, 2, 1, 1)
 
         # font Bahnschrift Condensed
-        LogCSS = """
-        QTextBrowser{
-            background-color: white;
-            background-image: url('data/"""+Logo+"""');
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-        """
+        LogCSS = (
+            """
+            QTextBrowser{
+                background-color: white;
+                background-image: url('data/"""
+            + Logo
+            + """');
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            """
+        )
 
         # Log Process
-        self.text_Log = QtWidgets.QTextBrowser(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.text_Log = QTextBrowser(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.text_Log.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.text_Log.sizePolicy().hasHeightForWidth())
         self.text_Log.setSizePolicy(sizePolicy)
         self.text_Log.setObjectName("text_Log")
         self.text_Log.setStyleSheet(LogCSS)
@@ -221,9 +234,9 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QMetaObject.connectSlotsByName(MainWindow)
 
-    # Controller -----------------------------------------------------------------------------------------------------------
+        # Controller -----------------------------------------------------------------------------------------------------------
         # test selenium
         # browser = self.seleniumConfig()
 
@@ -241,66 +254,89 @@ class Ui_MainWindow(object):
         self.btn_Download.clicked.connect(self.btnDownload)
 
     def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
+        _translate = QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "LPSE 2E"))
-        MainWindow.setWindowIcon(QtGui.QIcon(f"data\\{Logo}"))
+        MainWindow.setWindowIcon(QIcon(f"data\\{Logo}"))
         self.label_Tahun.setText(_translate("MainWindow", "Tahun"))
         self.label_URL.setText(_translate("MainWindow", "URL"))
         self.label_Engine.setText(_translate("MainWindow", "Engine  "))
         self.label_Author.setText(_translate("MainWindow", Author))
-        self.URL.setPlaceholderText(_translate(
-            "MainWindow", "https://lpse.bireuenkab.go.id"))
+        self.URL.setPlaceholderText(
+            _translate("MainWindow", "https://lpse.bireuenkab.go.id")
+        )
         self.btn_Download.setText(_translate("MainWindow", "Download"))
         self.btn_Batch.setText(_translate("MainWindow", "Batch"))
         self.engine_PyProc.setText(_translate("MainWindow", "PyProc"))
         self.engine_Selenium.setText(_translate("MainWindow", "Scrapping"))
 
         # Home
-
-        self.text_Log.setText(f'<b>LPSE 2E v{Version}</b>')
-        self.text_Log.append('Engine:')
-        self.text_Log.append(f'- Pyproc v{pyprocVersion}')
-        self.text_Log.append(f'- Selenium v{seleniumVersion} ')
-        self.text_Log.append('<br><b>Catatan:<b>')
+        self.text_Log.setText(f"<b>LPSE 2E v{Version}</b>")
+        self.text_Log.append("Engine:")
+        self.text_Log.append(f"- Pyproc v{pyprocVersion}")
+        self.text_Log.append(f"- Selenium v{seleniumVersion} ")
         self.text_Log.append(
-            '- Pilih scrapping jika data LPSE tidak bisa diambil menggunakan PyProc')
-        self.text_Log.append(
-            '- Pastikan google chrome sudah versi terbaru apabila menggunakan Scrapping')
-        self.text_Log.append(
-            '- Lapor bug atau bantu ngembangin aplikasi https://github.com/seimpairiyun/LPSE-2E')
+            "<br><b>Catatan:</b>"
+            + "<br>- Pilih scrapping jika data LPSE tidak bisa diambil menggunakan PyProc"
+            + "<br>- Pastikan google chrome sudah versi terbaru apabila menggunakan Scrapping"
+            + "<br>- Lapor bug atau bantu ngembangin aplikasi https://github.com/seimpairiyun/LPSE-2E"
+        )
 
     # UTILITY
     # def getTime(self):
     #     return datetime.now()
 
+    def timer(self, n=100):
+        loop = QEventLoop()
+        QTimer.singleShot(n, loop.quit)
+        loop.exec_()
+
+    def loadBar(self, value):
+        self.loading = QProgressDialog("Loading..", None, 0, value)
+        self.loading.setWindowModality(Qt.ApplicationModal)  # Deactive MainWindow
+        self.loading.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.loading.setAutoClose(True)
+
+        for i in range(value + 1):
+            self.loading.setValue(i)
+            self.timer(500)
+            if self.loading.wasCanceled():
+                break
+
     def btnDownload(self):
+        self.loadBar(10)
+
         self.text_Log.setText(str(self.Tahun.currentText()))
         self.text_Log.append(str(self.URL.text()))
         self.text_Log.append(self.engineSetup())
-        self.text_Log.append(
-            self.seleniumConfig().capabilities['browserVersion'])
+        # self.text_Log.append(self.seleniumConfig().capabilities['browserVersion'])
         # self.seleniumConfig().close()
         # self.seleniumConfig().quit()
 
-        if self.URL.text() == '':
+        # URL Validation
+        regex = r"https?://lpse\..+\.(?:go|ac)\.id"
+        isLPSE = re.findall(regex, self.URL.text())
+
+        if self.URL.text() == "":
             self.URL.setFocus()
-        elif self.engineSetup() == '':
-            self.text_Log.setText('Silahkan pilih salah satu engine')
+        elif isLPSE == []:
+            self.text_Log.setText("URL tidak benar")
+        elif self.engineSetup() == "":
+            self.text_Log.setText("Silahkan pilih salah satu engine")
 
     def engineSetup(self):
         if self.engine_PyProc.isChecked():
             self.engine_Selenium.setDisabled(True)
-            engine = 'Pyproc'
+            engine = "Pyproc"
         elif self.engine_Selenium.isChecked():
             self.engine_PyProc.setDisabled(True)
-            engine = 'Scrapping'
+            engine = "Scrapping"
         else:
             self.engine_PyProc.setDisabled(False)
             self.engine_Selenium.setDisabled(False)
-            engine = ''
+            engine = ""
 
-        return engine
         # print(f'{i.text()}: {i.isChecked()}')
+        return engine
 
     def seleniumConfig(self):
         options = Options()
@@ -316,39 +352,58 @@ class Ui_MainWindow(object):
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("--ignore-ssl-errors")
 
-        driver = webdriver.Chrome(service=ChromeService(
-            ChromeDriverManager().install()), options=options)
+        driver = webdriver.Chrome(
+            service=ChromeService(ChromeDriverManager().install()), options=options
+        )
 
         return driver
 
+
 # MAIN
-
-
-class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
 
     def getTime(self):
-         return datetime.now()
+        return datetime.now()
+
+    def btnDownloada(self):
+        self.text_Log.setText(str(self.Tahun.currentText()))
+        self.text_Log.append(str(self.URL.text()))
+        self.text_Log.append(self.engineSetup())
+        # self.text_Log.append(self.seleniumConfig().capabilities['browserVersion'])
+        # self.seleniumConfig().close()
+        # self.seleniumConfig().quit()
+
+        # URL Validation
+        regex = r"https?://lpse\..+\.(?:go|ac)\.id"
+        isLPSE = re.findall(regex, self.URL.text())
+
+        if self.URL.text() == "":
+            self.URL.setFocus()
+        elif isLPSE == []:
+            self.text_Log.setText("URL tidak benar")
+        elif self.engineSetup() == "":
+            self.text_Log.setText("Silahkan pilih salah satu engine")
 
     def closeEvent(self, event):
-        # close = QtWidgets.QMessageBox()
+        # close = QMessageBox()
         # close.setText("You sure?")
-        # close.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel)
+        # close.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         # close = close.exec()
 
-        # if close == QtWidgets.QMessageBox.Yes:
+        # if close == QMessageBox.Yes:
         #     event.accept()
         #     print(1)
         # else:
         #     event.ignore()
         event.accept()
-        print('Close')
+        print("Close")
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     main = MainWindow()
     main.show()
     sys.exit(app.exec_())
