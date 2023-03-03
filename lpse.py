@@ -10,7 +10,7 @@ from urllib3 import disable_warnings, exceptions as exc_URL
 # ------------------------------------------------------------
 
 #!URLLIB3 DISABLE WARNING
-disable_warnings(category=[
+disable_warnings(category=(
     exc_URL.InsecureRequestWarning,
     exc_URL.NewConnectionError,
     exc_URL.MaxRetryError,
@@ -20,7 +20,7 @@ disable_warnings(category=[
     exc_Req.RetryError,
     exc_Req.HTTPError,
     exc_Req.ConnectTimeout,
-])
+))
 
 
 def clear_line():
@@ -42,7 +42,7 @@ def validJSON(data):
 
 def openLPSE(url):
     # Pyproc Settings
-    return Lpse(f'{url}', timeout=30, skip_spse_check=False)
+    return Lpse(f'{url}', timeout=60)
 
 
 def getData(url, id_paket):
@@ -128,7 +128,10 @@ def saveDataLPSE(url, tahun=None, length=9999):
                     'khusus_orang_asli_papua_(oap)',
                     'alasan_pembatalan',
                     'alasan_di_ulang',
-                    'reverse_auction?'
+                    'reverse_auction?',
+                    'uraian_singkat_pekerjaan',
+                    'bobot_teknis',
+                    'bobot_biaya'
                 ]
 
                 try:
@@ -158,7 +161,6 @@ def saveDataLPSE(url, tahun=None, length=9999):
                     print(e)
             except Exception as e:
                 print(e)
-                print(11)
 
         else:
             print('Data LPSE masih kosong')
@@ -172,12 +174,13 @@ def saveDataLPSE(url, tahun=None, length=9999):
 
 app_start = time.now()
 
-url = 'http://lpse.bireuenkab.go.id'
+url = 'https://lpse.bireuenkab.go.id'
 regex = r"https?://lpse\..+\.(?:go|ac)\.id"
 isLPSE = re.findall(regex, url)
 
 if isLPSE != []:
-    df = saveDataLPSE(url, 2020, 13)
+    saveDataLPSE(url, 2022, 5)
     print(durasi(app_start))
 else:
     print('URL tidak benar')
+

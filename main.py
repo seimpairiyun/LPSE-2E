@@ -33,6 +33,7 @@ from PyQt5.QtWidgets import (
     QTextBrowser,
     QCheckBox,
     QProgressDialog,
+    QMessageBox
 )
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
@@ -252,6 +253,8 @@ class Ui_MainWindow(object):
         self.engine_PyProc.stateChanged.connect(self.engineSetup)
         self.engine_Selenium.toggled.connect(self.engineSetup)
         self.btn_Download.clicked.connect(self.btnDownload)
+        self.btn_Batch.clicked.connect(self.yearQuestion)
+
 
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
@@ -303,7 +306,7 @@ class Ui_MainWindow(object):
                 break
 
     def btnDownload(self):
-        self.loadBar(10)
+        self.loadBar(20)
 
         self.text_Log.setText(str(self.Tahun.currentText()))
         self.text_Log.append(str(self.URL.text()))
@@ -368,36 +371,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def getTime(self):
         return datetime.now()
 
-    def btnDownloada(self):
-        self.text_Log.setText(str(self.Tahun.currentText()))
-        self.text_Log.append(str(self.URL.text()))
-        self.text_Log.append(self.engineSetup())
-        # self.text_Log.append(self.seleniumConfig().capabilities['browserVersion'])
-        # self.seleniumConfig().close()
-        # self.seleniumConfig().quit()
+    def yearQuestion(self):
+         self.msg = QMessageBox()
+         self.msg.setWindowIcon(QIcon(f"data\\{Logo}"))
+         self.msg.setWindowTitle('Info')
+         self.msg.setText(f"Download sampai dengan tahun {self.getTime().year}?")
+         self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+         self.msg.exec()
 
-        # URL Validation
-        regex = r"https?://lpse\..+\.(?:go|ac)\.id"
-        isLPSE = re.findall(regex, self.URL.text())
+         if self.msg == QMessageBox.Yes:
+             self.text_Log.setText('Yes')
+         else:
+             self.text_Log.setText('No')
 
-        if self.URL.text() == "":
-            self.URL.setFocus()
-        elif isLPSE == []:
-            self.text_Log.setText("URL tidak benar")
-        elif self.engineSetup() == "":
-            self.text_Log.setText("Silahkan pilih salah satu engine")
 
-    def closeEvent(self, event):
-        # close = QMessageBox()
-        # close.setText("You sure?")
-        # close.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        # close = close.exec()
-
-        # if close == QMessageBox.Yes:
-        #     event.accept()
-        #     print(1)
-        # else:
-        #     event.ignore()
+    def closeEvent(self, event):        
         event.accept()
         print("Close")
 
