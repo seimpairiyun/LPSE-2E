@@ -174,7 +174,7 @@ def saveDataLPSE(url, tahun=None, length=9999):
 
 app_start = time.now()
 
-url = 'https://lpse.bireuenkab.go.id'
+url = 'http://lpse.bandaacehkota.go.id'
 regex = r"https?://lpse\..+\.(?:go|ac)\.id"
 isLPSE = re.findall(regex, url)
 

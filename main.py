@@ -1,23 +1,18 @@
 # 12 Februari 2023 by Mhd Afizha Aw
 # Created by: PyQt5 UI code generator 5.15.1
-from socket import timeout as TIMEOUT_1, gaierror as TIMEOUT_5
-from urllib3.exceptions import (
-    ReadTimeoutError as TIMEOUT_2,
-    NewConnectionError as TIMEOUT_6,
-    MaxRetryError as TIMEOUT_7,
-)
-from requests.exceptions import ReadTimeout as TIMEOUT_3, ConnectionError as TIMEOUT_4
-from selenium.common.exceptions import SessionNotCreatedException
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium import webdriver, __version__ as seleniumVersion
-from pyproc import Lpse, __version__ as pyprocVersion
-from pyproc.utils import re
-from datetime import datetime
+
+# ABOUT
+Author = "Crafted by <b>Mhd Afizha Aw</b>"
+Logo = "log.opng"
+Version = "0.1.3"
+
+# MODULES
+from datetime import datetime as time
+from sys import argv as sysARGV, exit as sysEXIT
+from pandas import DataFrame, ExcelWriter
+from requests import exceptions as exc_Req
+from urllib3 import disable_warnings, exceptions as exc_URL
+
 from PyQt5.QtCore import Qt, QMetaObject, QCoreApplication, QSize, QEventLoop, QTimer
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import (
@@ -33,15 +28,36 @@ from PyQt5.QtWidgets import (
     QTextBrowser,
     QCheckBox,
     QProgressDialog,
-    QMessageBox
+    QMessageBox,
 )
-from PyQt5 import QtCore, QtGui, QtWidgets
-import sys
 
-# ABOUT
-Author = "Crafted by Mhd Afizha Aw"
-Logo = "log.opng"
-Version = "0.1.3"
+from selenium.common.exceptions import SessionNotCreatedException
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium import webdriver, __version__ as seleniumVersion
+from pyproc import Lpse, __version__ as pyprocVersion
+from pyproc.utils import json
+from pyproc.utils import re
+
+#!URLLIB3 DISABLE WARNING
+disable_warnings(
+    category=(
+        exc_URL.InsecureRequestWarning,
+        exc_URL.NewConnectionError,
+        exc_URL.MaxRetryError,
+        exc_URL.HTTPError,
+        exc_URL.HTTPWarning,
+        exc_Req.ConnectionError,
+        exc_Req.RetryError,
+        exc_Req.HTTPError,
+        exc_Req.ConnectTimeout,
+    )
+)
+
 
 # LAYOUT
 class Ui_MainWindow(object):
@@ -56,8 +72,7 @@ class Ui_MainWindow(object):
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
 
-        # LABEL -------------------------------------------------------------------------------------------->
-        # Tahun
+        # Label Tahun
         self.label_Tahun = QLabel(self.centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -71,7 +86,7 @@ class Ui_MainWindow(object):
         self.label_Tahun.setObjectName("label_Tahun")
         self.gridLayout.addWidget(self.label_Tahun, 0, 0, 1, 1)
 
-        # URL
+        # Label URL
         self.label_URL = QLabel(self.centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -83,13 +98,13 @@ class Ui_MainWindow(object):
         self.label_URL.setObjectName("label_URL")
         self.gridLayout.addWidget(self.label_URL, 1, 0, 1, 1)
 
-        # Engine
+        # Label Engine
         self.label_Engine = QLabel(self.centralwidget)
         self.label_Engine.setFont(font)
         self.label_Engine.setObjectName("label_Engine")
         self.gridLayout.addWidget(self.label_Engine, 3, 0, 1, 1)
 
-        # Programmer
+        # Label Programmer
         self.label_Author = QLabel(self.centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
@@ -117,8 +132,8 @@ class Ui_MainWindow(object):
         self.Tahun.setFocus()
         self.gridLayout.addWidget(self.Tahun, 0, 1, 1, 2)
 
+        # Generate Tahun
         tahunNow = int(self.getTime().year) + 1
-
         for th in reversed(range(tahunNow)):
             if th >= 2012:  # Data LPSE mulai tahun 2012
                 self.Tahun.addItem(str(th))
@@ -245,7 +260,7 @@ class Ui_MainWindow(object):
         # browser.capabilities['browserVersion']
 
         # auto run after enter clicked while input URL
-        self.URL.returnPressed.connect(self.btnDownload)
+        ##self.URL.returnPressed.connect(self.btnDownload)
 
         # self.engine_PyProc.stateChanged.connect(lambda:self.engineSetup(self.engine_PyProc))
         # self.engine_Selenium.toggled.connect(lambda:self.engineSetup(self.engine_Selenium))
@@ -254,7 +269,6 @@ class Ui_MainWindow(object):
         self.engine_Selenium.toggled.connect(self.engineSetup)
         self.btn_Download.clicked.connect(self.btnDownload)
         self.btn_Batch.clicked.connect(self.yearQuestion)
-
 
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
@@ -274,9 +288,11 @@ class Ui_MainWindow(object):
 
         # Home
         self.text_Log.setText(f"<b>LPSE 2E v{Version}</b>")
-        self.text_Log.append("Engine:")
-        self.text_Log.append(f"- Pyproc v{pyprocVersion}")
-        self.text_Log.append(f"- Selenium v{seleniumVersion} ")
+        self.text_Log.append(
+            "Engine:"
+            + f"\n- Pyproc v{pyprocVersion}"
+            + f"\n- Selenium v{seleniumVersion} "
+        )
         self.text_Log.append(
             "<br><b>Catatan:</b>"
             + "<br>- Pilih scrapping jika data LPSE tidak bisa diambil menggunakan PyProc"
@@ -284,9 +300,45 @@ class Ui_MainWindow(object):
             + "<br>- Lapor bug atau bantu ngembangin aplikasi https://github.com/seimpairiyun/LPSE-2E"
         )
 
-    # UTILITY
-    # def getTime(self):
-    #     return datetime.now()
+
+# MAIN APP
+class MainWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self, *args, obj=None, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+
+        # CONTROLLERS
+        self.URL.returnPressed.connect(self.btnDownload)
+
+    def closeEvent(self, event):
+        event.accept()
+        print("Close")
+
+    def getTime(self):
+        return time.now()
+
+    def validJSON(data):
+        return json.loads(json.dumps(data))
+
+    def durasi(self, app_start):
+        app_stop = time.now()
+        selisih = app_stop - app_start
+        getDurasi = divmod(selisih.seconds, 60)
+        durasi = f"Done. {getDurasi[0]} menit {getDurasi[1]} detik"
+        return durasi
+
+    def yearQuestion(self):
+        self.msg = QMessageBox()
+        self.msg.setWindowIcon(QIcon(f"data\\{Logo}"))
+        self.msg.setWindowTitle("Info")
+        self.msg.setText(f"Download sampai dengan tahun {self.getTime().year}?")
+        self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        self.msg.exec()
+
+        if self.msg == QMessageBox.Yes:
+            self.text_Log.setText("Yes")
+        else:
+            self.text_Log.setText("No")
 
     def timer(self, n=100):
         loop = QEventLoop()
@@ -294,6 +346,8 @@ class Ui_MainWindow(object):
         loop.exec_()
 
     def loadBar(self, value):
+        app_start = time.now()
+
         self.loading = QProgressDialog("Loading..", None, 0, value)
         self.loading.setWindowModality(Qt.ApplicationModal)  # Deactive MainWindow
         self.loading.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
@@ -305,26 +359,42 @@ class Ui_MainWindow(object):
             if self.loading.wasCanceled():
                 break
 
-    def btnDownload(self):
-        self.loadBar(20)
+        self.text_Log.append(self.durasi(app_start))
+        self.timer(1000)
 
-        self.text_Log.setText(str(self.Tahun.currentText()))
-        self.text_Log.append(str(self.URL.text()))
-        self.text_Log.append(self.engineSetup())
+    def btnDownload(self):
+
+        # self.text_Log.setText(str(self.Tahun.currentText()))
+        # self.text_Log.append(str(self.URL.text()))
+        # self.text_Log.append(self.engineSetup())
         # self.text_Log.append(self.seleniumConfig().capabilities['browserVersion'])
         # self.seleniumConfig().close()
         # self.seleniumConfig().quit()
+
+        # Engine
+        url = self.URL.text()
+        engine = self.engineSetup()
+        tahun = str(self.Tahun.currentText())
 
         # URL Validation
         regex = r"https?://lpse\..+\.(?:go|ac)\.id"
         isLPSE = re.findall(regex, self.URL.text())
 
-        if self.URL.text() == "":
+        if url == "":
             self.URL.setFocus()
         elif isLPSE == []:
             self.text_Log.setText("URL tidak benar")
-        elif self.engineSetup() == "":
+        elif engine == "":
             self.text_Log.setText("Silahkan pilih salah satu engine")
+        else:
+            self.text_Log.clear()
+            self.text_Log.setText(f"Engine: {engine}")
+            self.timer(500)
+            self.text_Log.append(f"Trying to access {url}")
+            self.timer(500)
+            self.text_Log.append(f"Trying to download data LPSE {tahun}\n")
+            self.timer(500)
+            self.loadBar(20)
 
     def engineSetup(self):
         if self.engine_PyProc.isChecked():
@@ -341,6 +411,62 @@ class Ui_MainWindow(object):
         # print(f'{i.text()}: {i.isChecked()}')
         return engine
 
+    # ENGINE PYPROC
+    def openLPSE(self, url):
+        # Pyproc Settings
+        return Lpse(f"{url}", timeout=60)
+
+    def getData(self, url, id_paket):
+        # GET DETAIL TENDER
+        lpse = self.openLPSE(url)
+
+        detil = lpse.detil_paket_tender(id_paket)
+        detil.get_all_detil()
+
+        # Manual gettting detil data and cleansing into valid Dict(JSON)
+        """ 
+        removeQuote = str(detil).replace("'", '"')
+        removeBoolNone = r'True|False|None'
+        detilPaket = re.sub(removeBoolNone, '""', removeQuote)
+        dataDetilPaket = json.loads(detilPaket) 
+        """
+
+        id = detil.id_paket
+        link = f"{url}/eproc4/lelang/{id}/pengumumanlelang"
+        # rup = detil.pengumuman['rencana_umum_pengadaan'][0]['kode_rup']
+
+        try:
+            winner = detil.pemenang[0]
+        except Exception as e:
+            winner = ""
+
+        try:
+            lokasi = detil.pengumuman["lokasi_pekerjaan"][0]
+        except Exception as e:
+            lokasi = ""
+
+        try:
+            # Set into Dict(JSON)
+            dataSet = dict(link_lpse=link)
+            dataSet.update(detil.pengumuman)
+            dataSet["lokasi_pekerjaan"] = lokasi
+            dataSet.update(winner)
+
+            # handler error when try to remove this column
+            dataSet["alasan_pembatalan"] = ""
+            dataSet["alasan_di_ulang"] = ""
+
+            return dataSet
+
+        except TypeError as e:
+            self.text_Log.setText(e)
+            print(e)
+            return dict(link_lpse="download failed")
+        except Exception as e:
+            self.text_Log.setText(e)
+            print(e)
+
+    # ENGINE SELENIUM
     def seleniumConfig(self):
         options = Options()
         options.add_argument("--disable-gpu")
@@ -362,36 +488,9 @@ class Ui_MainWindow(object):
         return driver
 
 
-# MAIN
-class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, *args, obj=None, **kwargs):
-        super(MainWindow, self).__init__(*args, **kwargs)
-        self.setupUi(self)
-
-    def getTime(self):
-        return datetime.now()
-
-    def yearQuestion(self):
-         self.msg = QMessageBox()
-         self.msg.setWindowIcon(QIcon(f"data\\{Logo}"))
-         self.msg.setWindowTitle('Info')
-         self.msg.setText(f"Download sampai dengan tahun {self.getTime().year}?")
-         self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-         self.msg.exec()
-
-         if self.msg == QMessageBox.Yes:
-             self.text_Log.setText('Yes')
-         else:
-             self.text_Log.setText('No')
-
-
-    def closeEvent(self, event):        
-        event.accept()
-        print("Close")
-
-
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QApplication(sysARGV)
     main = MainWindow()
     main.show()
-    sys.exit(app.exec_())
+
+    sysEXIT(app.exec_())
