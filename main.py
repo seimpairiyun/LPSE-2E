@@ -1,20 +1,22 @@
 # 12 Februari 2023 by Mhd Afizha Aw
 # Created by: PyQt5 UI code generator 5.15.1
 
-# ABOUT
-Author = "Crafted by <b>Mhd Afizha Aw</b>"
-Logo = "log.opng"
-Version = "0.1.3"
+from os import path
+
+print(path.dirname)
 
 # MODULES
-from datetime import datetime as time
-from sys import argv as sysARGV, exit as sysEXIT
-from pandas import DataFrame, ExcelWriter
-from requests import exceptions as exc_Req
-from urllib3 import disable_warnings, exceptions as exc_URL
-
-from PyQt5.QtCore import Qt, QMetaObject, QCoreApplication, QSize, QEventLoop, QTimer
-from PyQt5.QtGui import QIcon, QFont
+from pyproc.utils import re
+from pyproc.utils import json
+from pyproc import Lpse, __version__ as pyprocVersion
+from selenium import webdriver, __version__ as seleniumVersion
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.common.exceptions import SessionNotCreatedException
 from PyQt5.QtWidgets import (
     QWidget,
     QMainWindow,
@@ -27,21 +29,26 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QTextBrowser,
     QCheckBox,
+    QFileDialog,
     QProgressDialog,
+    QProgressBar,
     QMessageBox,
 )
+from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import Qt, QMetaObject, QCoreApplication, QSize, QEventLoop, QTimer
+from urllib3 import disable_warnings, exceptions as exc_URL, request
+from urllib.request import urlopen
+from requests import exceptions as exc_Req
+from pandas import DataFrame, ExcelWriter
+from sys import argv as sysARGV, exit as sysEXIT
+from datetime import datetime as time
+from pathlib import Path
 
-from selenium.common.exceptions import SessionNotCreatedException
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium import webdriver, __version__ as seleniumVersion
-from pyproc import Lpse, __version__ as pyprocVersion
-from pyproc.utils import json
-from pyproc.utils import re
+# ABOUT
+Author = "Crafted by <b>Mhd Afizha Aw</b>"
+Logo = "log.opng"
+Version = "0.1.3"
+
 
 #!URLLIB3 DISABLE WARNING
 disable_warnings(
@@ -260,15 +267,17 @@ class Ui_MainWindow(object):
         # browser.capabilities['browserVersion']
 
         # auto run after enter clicked while input URL
-        ##self.URL.returnPressed.connect(self.btnDownload)
+        # self.URL.returnPressed.connect(self.btnDownload)
 
         # self.engine_PyProc.stateChanged.connect(lambda:self.engineSetup(self.engine_PyProc))
         # self.engine_Selenium.toggled.connect(lambda:self.engineSetup(self.engine_Selenium))
 
+        # CONTROLLERS
+        self.URL.returnPressed.connect(self.btnDownload)
         self.engine_PyProc.stateChanged.connect(self.engineSetup)
         self.engine_Selenium.toggled.connect(self.engineSetup)
         self.btn_Download.clicked.connect(self.btnDownload)
-        self.btn_Batch.clicked.connect(self.yearQuestion)
+        self.btn_Batch.clicked.connect(self.browseFile)
 
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
@@ -307,8 +316,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
 
-        # CONTROLLERS
-        self.URL.returnPressed.connect(self.btnDownload)
+    def isInternet(self, host="http://google.com"):
+        try:
+            urlopen(host)
+            return "Ok"
+        except:
+            return False
 
     def closeEvent(self, event):
         event.accept()
@@ -317,14 +330,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def getTime(self):
         return time.now()
 
-    def validJSON(data):
+    def browseFile(self):
+        typeFile = "csv (*.csv);;All (*.*)"
+        getFile = QFileDialog.getOpenFileName(None, "", "", typeFile)[0]
+        file = Path(getFile)
+
+        self.text_Log.setText(f"Load file {file.name} from {file.parent}")
+
+    def validJSON(self, data):
         return json.loads(json.dumps(data))
 
     def durasi(self, app_start):
         app_stop = time.now()
         selisih = app_stop - app_start
         getDurasi = divmod(selisih.seconds, 60)
-        durasi = f"Done. {getDurasi[0]} menit {getDurasi[1]} detik"
+        durasi = f"\nDone.\nIn {getDurasi[0]} minutes {getDurasi[1]} seconds"
         return durasi
 
     def yearQuestion(self):
@@ -355,12 +375,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         for i in range(value + 1):
             self.loading.setValue(i)
-            self.timer(500)
+            self.timer(250)
             if self.loading.wasCanceled():
                 break
 
         self.text_Log.append(self.durasi(app_start))
-        self.timer(1000)
+        self.timer(500)
 
     def btnDownload(self):
 
@@ -377,10 +397,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         tahun = str(self.Tahun.currentText())
 
         # URL Validation
-        regex = r"https?://lpse\..+\.(?:go|ac)\.id"
+        regex = r"https?://lpse\..+\.(?:go|ac)\.id$"
         isLPSE = re.findall(regex, self.URL.text())
 
-        if url == "":
+        if self.isInternet() == False:
+            self.text_Log.setText("No internet connection")
+        elif url == "":
             self.URL.setFocus()
         elif isLPSE == []:
             self.text_Log.setText("URL tidak benar")
@@ -388,13 +410,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.text_Log.setText("Silahkan pilih salah satu engine")
         else:
             self.text_Log.clear()
-            self.text_Log.setText(f"Engine: {engine}")
-            self.timer(500)
+            self.timer(100)
             self.text_Log.append(f"Trying to access {url}")
             self.timer(500)
-            self.text_Log.append(f"Trying to download data LPSE {tahun}\n")
+            self.text_Log.append(f"Trying to download data LPSE {tahun}")
             self.timer(500)
-            self.loadBar(20)
+            # self.loadBar(20)
+
+            appStart = time.now()
+            self.saveDataLPSE(url, tahun)
+            self.text_Log.append(self.durasi(appStart))
 
     def engineSetup(self):
         if self.engine_PyProc.isChecked():
@@ -459,12 +484,110 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return dataSet
 
         except TypeError as e:
-            self.text_Log.setText(e)
-            print(e)
+            self.text_Log.append(e)
             return dict(link_lpse="download failed")
         except Exception as e:
-            self.text_Log.setText(e)
-            print(e)
+            self.text_Log.append(e)
+
+    def saveDataLPSE(self, url, tahun=None, length=9999):
+        #try:
+        lpse = self.openLPSE(url)
+
+        # GET TENDER
+        tender = lpse.get_paket_tender(tahun=tahun, length=length)
+        getTender = self.validJSON(tender)
+
+        total = getTender["recordsTotal"]
+        data = getTender["data"]
+
+
+
+        # Loading Bar
+        self.loading = QProgressDialog()
+        self.loading.setMaximum(total)
+        self.loading.findChild(QProgressBar).setTextVisible(False) #hide percen
+        self.loading.setCancelButton(None)
+        self.loading.setWindowModality(Qt.ApplicationModal)  # Deactive MainWindow
+        self.loading.setWindowFlags(
+            Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint
+        )
+        self.loading.setAutoClose(True)
+
+        if data != []:
+            # RUN APP
+            try:
+                dataList = []
+                n = 0
+                for i in data:
+                    n = n + 1
+                    #process = n / total * 100
+                    #result = str(f"{n}|{total} - {process:.2f}%")
+                    #self.text_Log.append(result)
+                    #self.timer(100)
+                    #print(f'{n}|{total} - {process:.2f}%')
+                    
+                    #loadingbar
+                    self.loading.setValue(n)
+                    self.loading.setLabelText(f'Downloading {n}/{total} data..')
+                    self.timer(250)
+                    if self.loading.wasCanceled():
+                        break
+
+                    target = self.getData(url, i[0])
+                    dataList.append(target)
+
+                # Result
+                self.text_Log.append(f'{total} data saved.')
+
+                # REMOVE USELESS COLUMNS
+                uselessCol = [
+                    "kode_tender",
+                    "rencana_umum_pengadaan",
+                    # "label_paket",
+                    "peserta_tender",
+                    "khusus_orang_asli_papua_(oap)",
+                    "alasan_pembatalan",
+                    "alasan_di_ulang",
+                    "reverse_auction?",
+                    "uraian_singkat_pekerjaan",
+                    "bobot_teknis",
+                    "bobot_biaya",
+                ]
+
+                try:
+                    df = DataFrame(dataList)  # DataFrame
+
+                    try:
+                        # RemoveColumns
+                        [df.pop(key) for key in uselessCol]
+                        # Fix Position
+                        col = df.pop("lokasi_pekerjaan")
+                        df.insert(13, "lokasi_pekerjaan", col)
+                    except:
+                        pass
+
+                    # Export to Excel
+                    fileName = url.split(".")[1]
+
+                    excel = ExcelWriter(f"lpse_{fileName}_{tahun}.xlsx", "openpyxl")
+                    df.to_excel(excel, index=False)
+                    # excel.book.set_properties({'author': 'seimpairiyun'}) #xlsxwriter
+                    excel.book.properties.creator = "seimpairiyun"
+                    excel.close()
+
+                    return df
+
+                except Exception as e:
+                    self.text_Log.setText(e)
+            except Exception as e:
+                self.text_Log.setText(e)
+
+        else:
+            self.text_Log.append("Data LPSE masih kosong")
+
+        #except Exception as e:
+        #    self.text_Log.append("URL Failed to Open")
+            # self.text_Log.setText(e)
 
     # ENGINE SELENIUM
     def seleniumConfig(self):
