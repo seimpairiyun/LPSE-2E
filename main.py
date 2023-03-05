@@ -1,11 +1,17 @@
 # 12 Februari 2023 by Mhd Afizha Aw
 # Created by: PyQt5 UI code generator 5.15.1
 
-from os import path
-
-print(path.dirname)
 
 # MODULES
+from pathlib import Path
+from os import getcwd as thisPath
+from datetime import datetime as time
+from requests import exceptions as exc_Req
+from sys import argv as sysARGV, exit as sysEXIT
+from urllib.request import urlopen
+from urllib3 import disable_warnings, exceptions as exc_URL
+
+from pandas import DataFrame, ExcelWriter
 from pyproc.utils import re
 from pyproc.utils import json
 from pyproc import Lpse, __version__ as pyprocVersion
@@ -36,13 +42,6 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import Qt, QMetaObject, QCoreApplication, QSize, QEventLoop, QTimer
-from urllib3 import disable_warnings, exceptions as exc_URL, request
-from urllib.request import urlopen
-from requests import exceptions as exc_Req
-from pandas import DataFrame, ExcelWriter
-from sys import argv as sysARGV, exit as sysEXIT
-from datetime import datetime as time
-from pathlib import Path
 
 # ABOUT
 Author = "Crafted by <b>Mhd Afizha Aw</b>"
@@ -332,10 +331,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def browseFile(self):
         typeFile = "csv (*.csv);;All (*.*)"
-        getFile = QFileDialog.getOpenFileName(None, "", "", typeFile)[0]
-        file = Path(getFile)
 
-        self.text_Log.setText(f"Load file {file.name} from {file.parent}")
+        try:
+            getFile = QFileDialog.getOpenFileName(None, "", "", typeFile)[0]
+            file = Path(getFile)
+
+            if getFile != '':
+                self.text_Log.setText(f"Load file {file.name} from {file.parent}")
+        except Exception as e:
+            self.text_Log.setText(e)
+
 
     def validJSON(self, data):
         return json.loads(json.dumps(data))
@@ -344,7 +349,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         app_stop = time.now()
         selisih = app_stop - app_start
         getDurasi = divmod(selisih.seconds, 60)
-        durasi = f"\nDone.\nIn {getDurasi[0]} minutes {getDurasi[1]} seconds"
+        durasi = f"\nFinish in {getDurasi[0]} minutes {getDurasi[1]} seconds"
+
+        self.timer(100)
         return durasi
 
     def yearQuestion(self):
@@ -413,12 +420,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.timer(100)
             self.text_Log.append(f"Trying to access {url}")
             self.timer(500)
-            self.text_Log.append(f"Trying to download data LPSE {tahun}")
+            self.text_Log.append(f"Trying to download data, please wait..")
             self.timer(500)
             # self.loadBar(20)
 
+            # Start App
             appStart = time.now()
-            self.saveDataLPSE(url, tahun)
+
+            if engine == 'Pyproc':
+                self.saveDataLPSE(url, tahun)
+            elif engine == 'Scrapping':
+                self.text_Log.append('Sorry, this engine still developing.')
+
+            # Stop App
             self.text_Log.append(self.durasi(appStart))
 
     def engineSetup(self):
@@ -490,103 +504,104 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.text_Log.append(e)
 
     def saveDataLPSE(self, url, tahun=None, length=9999):
-        #try:
-        lpse = self.openLPSE(url)
+        try:
+            lpse = self.openLPSE(url)
 
-        # GET TENDER
-        tender = lpse.get_paket_tender(tahun=tahun, length=length)
-        getTender = self.validJSON(tender)
+            # GET TENDER
+            tender = lpse.get_paket_tender(tahun=tahun, length=length)
+            getTender = self.validJSON(tender)
 
-        total = getTender["recordsTotal"]
-        data = getTender["data"]
+            total = getTender["recordsTotal"]
+            data = getTender["data"]
 
+            # Loading Bar
+            self.loading = QProgressDialog()
+            self.loading.setMaximum(total)
+            self.loading.findChild(QProgressBar).setTextVisible(False)  # hide percen
+            self.loading.setCancelButton(None)
+            self.loading.setWindowModality(Qt.ApplicationModal)  # Deactive MainWindow
+            self.loading.setWindowFlags(
+                Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint
+            )
+            self.loading.setAutoClose(True)
 
-
-        # Loading Bar
-        self.loading = QProgressDialog()
-        self.loading.setMaximum(total)
-        self.loading.findChild(QProgressBar).setTextVisible(False) #hide percen
-        self.loading.setCancelButton(None)
-        self.loading.setWindowModality(Qt.ApplicationModal)  # Deactive MainWindow
-        self.loading.setWindowFlags(
-            Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint
-        )
-        self.loading.setAutoClose(True)
-
-        if data != []:
-            # RUN APP
-            try:
-                dataList = []
-                n = 0
-                for i in data:
-                    n = n + 1
-                    #process = n / total * 100
-                    #result = str(f"{n}|{total} - {process:.2f}%")
-                    #self.text_Log.append(result)
-                    #self.timer(100)
-                    #print(f'{n}|{total} - {process:.2f}%')
-                    
-                    #loadingbar
-                    self.loading.setValue(n)
-                    self.loading.setLabelText(f'Downloading {n}/{total} data..')
-                    self.timer(250)
-                    if self.loading.wasCanceled():
-                        break
-
-                    target = self.getData(url, i[0])
-                    dataList.append(target)
-
-                # Result
-                self.text_Log.append(f'{total} data saved.')
-
-                # REMOVE USELESS COLUMNS
-                uselessCol = [
-                    "kode_tender",
-                    "rencana_umum_pengadaan",
-                    # "label_paket",
-                    "peserta_tender",
-                    "khusus_orang_asli_papua_(oap)",
-                    "alasan_pembatalan",
-                    "alasan_di_ulang",
-                    "reverse_auction?",
-                    "uraian_singkat_pekerjaan",
-                    "bobot_teknis",
-                    "bobot_biaya",
-                ]
-
+            # IF DATA READY
+            if data != []:
+                # RUN APP
                 try:
-                    df = DataFrame(dataList)  # DataFrame
+                    dataList = []
+                    n = 0
+                    for i in data:
+                        n = n + 1
+                        # process = n / total * 100
+                        # result = str(f"{n}|{total} - {process:.2f}%")
+                        # self.text_Log.append(result)
+                        # self.timer(100)
+                        # print(f'{n}|{total} - {process:.2f}%')
+
+                        # loadingbar
+                        self.loading.setValue(n)
+                        self.loading.setLabelText(f"Downloading {n}/{total} data..")
+                        self.timer(250)
+                        if self.loading.wasCanceled():
+                            break
+
+                        target = self.getData(url, i[0])
+                        dataList.append(target)
+
+                    # REMOVE USELESS COLUMNS
+                    uselessCol = [
+                        "kode_tender",
+                        "rencana_umum_pengadaan",
+                        # "label_paket",
+                        "peserta_tender",
+                        "khusus_orang_asli_papua_(oap)",
+                        "alasan_pembatalan",
+                        "alasan_di_ulang",
+                        "reverse_auction?",
+                        "uraian_singkat_pekerjaan",
+                        "bobot_teknis",
+                        "bobot_biaya",
+                    ]
 
                     try:
-                        # RemoveColumns
-                        [df.pop(key) for key in uselessCol]
-                        # Fix Position
-                        col = df.pop("lokasi_pekerjaan")
-                        df.insert(13, "lokasi_pekerjaan", col)
-                    except:
-                        pass
+                        df = DataFrame(dataList)  # DataFrame
 
-                    # Export to Excel
-                    fileName = url.split(".")[1]
+                        try:
+                            # RemoveColumns
+                            [df.pop(key) for key in uselessCol]
+                            # Fix Position
+                            col = df.pop("lokasi_pekerjaan")
+                            df.insert(13, "lokasi_pekerjaan", col)
+                        except:
+                            pass
 
-                    excel = ExcelWriter(f"lpse_{fileName}_{tahun}.xlsx", "openpyxl")
-                    df.to_excel(excel, index=False)
-                    # excel.book.set_properties({'author': 'seimpairiyun'}) #xlsxwriter
-                    excel.book.properties.creator = "seimpairiyun"
-                    excel.close()
+                        # Export to Excel
+                        lpseName = url.split(".")[1]
+                        fileName = f"lpse_{lpseName}_{tahun}.xlsx"
 
-                    return df
+                        excel = ExcelWriter(fileName, "openpyxl")
+                        df.to_excel(excel, index=False)
+                        # excel.book.set_properties({'author': 'seimpairiyun'}) #xlsxwriter
+                        excel.book.properties.creator = "seimpairiyun"
+                        excel.close()
 
+                        # Show file path
+                        # Result
+                        self.timer(100)
+                        self.text_Log.append(f'Done, file saved in {thisPath()}\{fileName}')
+                        #return df
+
+                    except Exception as e:
+                        self.text_Log.setText(e)
                 except Exception as e:
                     self.text_Log.setText(e)
-            except Exception as e:
-                self.text_Log.setText(e)
 
-        else:
-            self.text_Log.append("Data LPSE masih kosong")
+            else:
+                self.text_Log.append("Data LPSE masih kosong")
 
-        #except Exception as e:
-        #    self.text_Log.append("URL Failed to Open")
+        except Exception as e:
+            self.text_Log.append("URL Failed to Open")
             # self.text_Log.setText(e)
 
     # ENGINE SELENIUM
