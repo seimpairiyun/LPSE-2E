@@ -16,11 +16,10 @@
 LPSE two engine is an open-source tool that automates the process of downloading LPSE data. This tool is made with "pyproc" and other Python scraping modules such as Selenium and BeautifulSoup. The file exported from this tool is in Excel format. Enjoy!
 
 ## Screenshots
-<img src="https://i.ibb.co/rFgdqDh/LPSE-2E.png" width="40%"  alt="penampakan">
+<img src="https://i.ibb.co/rFgdqDh/LPSE-2E.png" width="100%"  alt="penampakan">
 
 ## Dependency
 ```
-- Pyproc from https://github.com/wakataw/pyproc
 - Only support Windows 64 bit
 - Latest Google Chrome 
 ```
