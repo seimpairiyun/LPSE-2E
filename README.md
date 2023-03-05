@@ -5,7 +5,8 @@
 ---
 
 <p align="center">
-<img src="https://img.shields.io/badge/python-3.x-yellow.svg">
+<img src="https://img.shields.io/badge/Python-3.x-yellow.svg">
+<img src="https://img.shields.io/badge/Pyqt5-5.15.1-green.svg">
 <img src="https://img.shields.io/badge/license-MIT-red.svg">
 <img src="https://img.shields.io/badge/tools-scrapping|web%20automation-blue"> 
 </p>
