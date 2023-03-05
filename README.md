@@ -5,10 +5,10 @@
 ---
 
 <p align="center">
-<img src="https://img.shields.io/badge/Python-3.x-yellow.svg">
-<img src="https://img.shields.io/badge/Pyqt5-5.15.1-green.svg">
-<img src="https://img.shields.io/badge/license-MIT-red.svg">
-<img src="https://img.shields.io/badge/tools-scrapping-blue"> 
+  <img src="https://img.shields.io/badge/Python-3.x-yellow.svg">
+  <img src="https://img.shields.io/badge/Pyqt5-5.15.1-green.svg">
+  <img src="https://img.shields.io/badge/license-MIT-red.svg">
+  <img src="https://img.shields.io/badge/tools-scrapping-blue"> 
 </p>
 
 
@@ -16,7 +16,9 @@
 LPSE two engine is an open-source tool that automates the process of downloading LPSE data. This tool is made with "pyproc" and other Python scraping modules such as Selenium and BeautifulSoup. The file exported from this tool is in Excel format. Enjoy!
 
 ## Screenshots
-<img src="https://i.ibb.co/rFgdqDh/LPSE-2E.png" width="100%"  alt="penampakan">
+<p align="center">
+  <img src="https://i.ibb.co/ZKCyst6/lpse2e.png" width="75%" alt="penampakan">
+</p>
 
 ## Dependency
 ```
