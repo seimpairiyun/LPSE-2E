@@ -303,8 +303,8 @@ class Ui_MainWindow(object):
         )
         self.text_Log.append(
             "<br><b>Catatan:</b>"
-            + "<br>- Pilih scrapping jika data LPSE tidak bisa diambil menggunakan PyProc"
-            + "<br>- Pastikan google chrome sudah versi terbaru"
+            + "<br>- Pilih scrapping jika PyProc gagal menarik data."
+            + "<br>- Pastikan google chrome sudah versi terbaru."
             + "<br>- Bug/support at https://github.com/seimpairiyun/LPSE-2E"
         )
 
@@ -349,7 +349,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         app_stop = time.now()
         selisih = app_stop - app_start
         getDurasi = divmod(selisih.seconds, 60)
-        durasi = f"\nFinish in {getDurasi[0]} minutes {getDurasi[1]} seconds"
+        durasi = f"<br><b>Finish in {getDurasi[0]} minutes {getDurasi[1]} seconds</b>"
 
         self.timer(100)
         return durasi
@@ -418,9 +418,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.text_Log.clear()
             self.timer(100)
-            self.text_Log.append(f"Trying to access {url}")
+            self.text_Log.append(f"Trying to access <b>{url}</b>")
             self.timer(500)
-            self.text_Log.append(f"Trying to download data, please wait..")
+            self.text_Log.append(f"Trying to download data, please wait..\n")
             self.timer(500)
             # self.loadBar(20)
 
@@ -428,7 +428,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             appStart = time.now()
 
             if engine == 'Pyproc':
-                self.saveDataLPSE(url, tahun)
+                self.pyprocStart(url, tahun)
             elif engine == 'Scrapping':
                 self.text_Log.append('Sorry, this engine still developing.')
 
@@ -451,13 +451,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return engine
 
     # ENGINE PYPROC
-    def openLPSE(self, url):
+    def pyprocOpenLpse(self, url):
         # Pyproc Settings
         return Lpse(f"{url}", timeout=60)
 
-    def getData(self, url, id_paket):
+    def pyprocGetData(self, url, id_paket):
         # GET DETAIL TENDER
-        lpse = self.openLPSE(url)
+        lpse = self.pyprocOpenLpse(url)
 
         detil = lpse.detil_paket_tender(id_paket)
         detil.get_all_detil()
@@ -472,7 +472,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         id = detil.id_paket
         link = f"{url}/eproc4/lelang/{id}/pengumumanlelang"
-        # rup = detil.pengumuman['rencana_umum_pengadaan'][0]['kode_rup']
+        self.text_Log.append(link)
 
         try:
             winner = detil.pemenang[0]
@@ -503,9 +503,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except Exception as e:
             self.text_Log.append(e)
 
-    def saveDataLPSE(self, url, tahun=None, length=9999):
+    def pyprocStart(self, url, tahun=None, length=9999):
         try:
-            lpse = self.openLPSE(url)
+            lpse = self.pyprocOpenLpse(url)
 
             # GET TENDER
             tender = lpse.get_paket_tender(tahun=tahun, length=length)
@@ -546,7 +546,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         if self.loading.wasCanceled():
                             break
 
-                        target = self.getData(url, i[0])
+                        target = self.pyprocGetData(url, i[0])
                         dataList.append(target)
 
                     # REMOVE USELESS COLUMNS
@@ -589,7 +589,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         # Show file path
                         # Result
                         self.timer(100)
-                        self.text_Log.append(f'Done, file saved in {thisPath()}\{fileName}')
+                        self.text_Log.append(f'<br><b style="color:green">Done</b>, file saved in {thisPath()}\{fileName}')
                         #return df
 
                     except Exception as e:
