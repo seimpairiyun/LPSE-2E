@@ -22,6 +22,6 @@ LPSE two engine is an open-source tool that automates the process of downloading
 
 ## Dependency
 ```
-- Only support Windows 64 bit
+- Windows 64 bit
 - Latest Google Chrome 
 ```
