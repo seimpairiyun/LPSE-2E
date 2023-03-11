@@ -304,8 +304,8 @@ class Ui_MainWindow(object):
         self.text_Log.append(
             "<br><b>Catatan:</b>"
             + "<br>- Pilih scrapping jika data LPSE tidak bisa diambil menggunakan PyProc"
-            + "<br>- Pastikan google chrome sudah versi terbaru apabila menggunakan Scrapping"
-            + "<br>- Lapor bug atau bantu ngembangin aplikasi https://github.com/seimpairiyun/LPSE-2E"
+            + "<br>- Pastikan google chrome sudah versi terbaru"
+            + "<br>- Bug/support at https://github.com/seimpairiyun/LPSE-2E"
         )
 
 
